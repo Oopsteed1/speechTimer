@@ -1,0 +1,364 @@
+.countdown-container {
+  text-align: center;
+  margin-top: 20px;
+  
+  .countdownTimer {
+    height: 700px;
+  }
+  .countdownTimer,
+  .inputCountdownTimer {
+    font-size: 500px;
+    font-weight: 550;
+    margin: 10px;
+    border-radius: 50px;
+    border: none;
+    color: #FFF;
+    background-color: #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+  }
+  .inputCountdownTimer {
+    width: 99%;
+    text-align: center;
+  }
+  input, button {
+    margin: 5px;
+  }
+
+  .warning-times {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    div {
+      display: flex;
+      align-items: center;
+
+      input {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .progress-container {
+    position: relative;
+    height: 30px;
+    background-color: lightgray;
+    margin-top: 10px;
+
+    .progress-bar {
+      position: absolute;
+      left: 0;
+      height: 100%;
+      background-color: yellow;
+    }
+
+    .progress-bar-yellow {
+      position: absolute;
+      height: 100%;
+      background-color: green;
+    }
+
+      /* 第三个警告时间的样式（橘色） */
+    .progress-bar-orange {
+      height: 100%;
+      background-color: orange;
+      position: absolute;
+    }
+
+    /* 第四个警告时间的样式（红色） */
+    .progress-bar-red {
+      background-color: red;
+      position: absolute;
+      height: 100%;
+    }
+    .arrow {
+      position: absolute;
+      top: 30px; /* 调整箭头的位置 */
+      left: calc(100% - 10px);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 15px solid #FFF; /* 红色箭头，可以根据需要更改颜色 */
+      transition: left 1s linear; /* 添加过渡效果 */
+    }
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .buttonImage {
+      cursor: pointer; /* 添加手型光标以指示可单击 */
+      margin: 30px; /* 可选：添加一些间距 */
+      width: 90px;
+      &.disabled {
+        pointer-events: none; /* 阻止点击事件 */
+        opacity: 0.1; /* 添加透明度以指示禁用状态 */
+      }
+      &.started {
+        opacity: 0.6;
+      }
+    }
+  }
+  
+}
+.warning-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  .warningTimer {
+    display: flex;
+    justify-content: center;
+    width: 33.3%;
+    font-size: 200px;
+    font-weight: 550;
+    margin: 10px;
+    border-radius: 50px;
+    color: #FFF;
+    background-color: #333;
+    height: 330px;
+    align-items: center;
+    .warningTimerIcon {
+      width: 128px;
+      height: 128px;
+    }
+  }
+  .inputWarningTimer {
+    width: 98%;
+    font-size: 200px;
+    border-radius: 50px;
+    background-color: #333;
+    border: none;
+    text-align: center;
+    font-weight: 550;
+  }
+}
+
+.slide-up {
+  animation: slide-up 0.5s ease forwards;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  background: #272727; /* 内容容器的背景色 */
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 阴影效果，可根据需要自定义 */
+  width: 100%;
+  height: 100%;
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  &.show {
+    transform: translateY(0);
+  }
+  .content-container {
+    position: relative;
+    color: #FFF;
+    display: flex;
+    flex-direction: column;
+    .title {
+      font-size: 150px;
+      border-bottom: 2px solid #fff;
+      margin-bottom: 50px;
+      font-weight: 500;
+    }
+    .content {
+      font-size: 105px;
+      padding: 0 100px;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+      background-color: #FFF;
+    }
+    .infoButtons {
+      display: flex;
+      justify-content: center;
+      gap: 100px;
+      margin-top: 100px;
+      .rate-button,
+      .app-button {
+        width: 700px;
+        height: 60px;
+        border-radius: 40px;
+        border: none;
+        cursor: pointer;
+        color: #FFF;
+        font-size: 22px;
+        transition: transform 0.3s ease;
+        background-color: #333;
+        &:hover {
+          transform: scale(1.1); /* 在悬停时放大按钮 */
+        }
+      }
+    }
+
+    .tagContent {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .tag-text {
+        text-align: center;
+        font-size: 100px;
+        background-color: #FFF;
+        color: #000;
+        width: 99%;
+        margin-bottom: 100px;
+      }
+    }
+    .tagButtonContent {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 10px; /* 指定按钮之间的间隔 */
+      margin: 0 auto; /* 居中对齐 */
+      .tag-button {
+        padding: 10px;
+        background-color: #333;
+        border: 1px solid #333;
+        cursor: pointer;
+        border-radius: 100px;
+        width: 760px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 100px;
+      }
+    }
+  }
+  .warning-timer-container {
+    .subtitle {
+      color: #FFF;
+      font-weight: 600;
+      font-size: 45px;
+      padding: 0;
+      margin: 0;
+    }
+    .time {
+      text-align: center;
+      font-size: 850px;
+      color: orange;
+      font-weight: 600;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 1020px;
+      
+    }
+    .progress-container {
+      position: relative;
+      height: 30px;
+      background-color: lightgray;
+      margin: 10px 0 50px 0;
+  
+      .progress-bar {
+        height: 100%;
+        width: 50%; /* 绿色部分占比 50% */
+        background-color: green;
+        transition: width 0.5s ease-in-out;
+        position: absolute;
+        z-index: 4;
+      }
+    
+      /* 黄色部分 */
+      .progress-bar-yellow {
+        height: 100%;
+        width: 75%; /* 黄色部分占比 25% */
+        background-color: yellow;
+        transition: width 0.5s ease-in-out;
+        position: absolute;
+        z-index: 3;
+      }
+    
+      /* 橙色部分 */
+      .progress-bar-orange {
+        height: 100%;
+        width: 90%; /* 橙色部分占比 15% */
+        background-color: orange;
+        transition: width 0.5s ease-in-out;
+        position: absolute;
+        z-index: 2;
+      }
+    
+      /* 红色部分 */
+      .progress-bar-red {
+        height: 100%;
+        width: 100%; /* 红色部分占比 10% */
+        background-color: red;
+        transition: width 0.5s ease-in-out;
+        position: absolute;
+        z-index: 1;
+      }
+      .arrow {
+        position: absolute;
+        top: 30px; /* 调整箭头的位置 */
+        left: 74.6% !important;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 15px solid #FFF; /* 红色箭头，可以根据需要更改颜色 */
+        transition: left 1s linear; /* 添加过渡效果 */
+      }
+    }
+    .back {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 600;
+      border: none;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 100px;
+      .restore-button,
+      .upgrade-button {
+        width: 400px;
+        height: 40px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        color: #FFF;
+        font-size: 22px;
+        transition: transform 0.3s ease;
+        &:hover {
+          transform: scale(1.1); /* 在悬停时放大按钮 */
+        }
+      }
+      .restore-button {
+        background-color: #777;
+      }
+      .upgrade-button {
+        background-color: #999;
+      }
+    }
+  }
+}

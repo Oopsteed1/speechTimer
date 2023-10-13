@@ -1,5 +1,4 @@
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,91 +7,154 @@ import { Router } from '@angular/router';
   styleUrls: ['./countdown-timer.component.scss'],
 })
 export class CountdownTimerComponent implements OnInit {
-  originalCountdownTime: string = '00:05'; // 保存原始倒计时时间
-  countdownTime: string = this.originalCountdownTime; // 当前倒计时时间
+  originalCountdownTime: string = '00:05';
+  countdownTime: string = this.originalCountdownTime;
   countdownStarted: boolean = false;
   editMode: boolean = false;
   unlocked: boolean = false;
   progress: number = 0;
-  warningTime: string = '00:03'; // 默认的警告倒计时时间
-  warningTime2: string = '00:02'; // 第三个警告时间，橘色
-  warningTime3: string = '00:01'; // 第四个警告时间，红色
+  warningTime: string = '00:03';
+  warningTime2: string = '00:02';
+  warningTime3: string = '00:01';
   warningTimeInSeconds: number = this.getSecondsFromTime(this.warningTime);
   intervalId: any;
-  normalTimeInSeconds: number = 5; // 一般计时器的持续时间（以秒为单位）
-  normalTimeProgress: number = 100; // 一般计时器的进度比例（0-100）
-  warningTimeProgress: number = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;; // Warning Time 计时器的进度比例（0-100）
+  normalTimeInSeconds: number = 5;
+  normalTimeProgress: number = 100;
+  warningTimeProgress: number = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;;
   arrowPosition: number = -0;
   timeEnded = false;
-  userInputTime: string = ''; // 用于接收用户输入的时间
+  userInputTime: string = '';
   arrowAnimationEnabled: boolean = false;
-  userInputWarningTime: string = '00:02'; // 用于编辑警告倒计时的输入框
-  editModeWarning: boolean = false; // 是否处于编辑模式
-  arrowPositionWarning: number = 0; // 箭头位置
-  warningIntervalId: any; // 用于保存警告倒计时的 Interval ID 
+  userInputWarningTime: string = '00:02';
+  editModeWarning: boolean = false;
+  arrowPositionWarning: number = 0;
+  warningIntervalId: any;
   warningEditable: boolean = false;
-  warningTimeProgress2: number = 0; // 第三个警告时间的进度
-  warningTimeProgress3: number = 0; // 第四个警告时间的进度
+  warningTimeProgress2: number = 0;
+  warningTimeProgress3: number = 0;
   isCardVisible = false;
   infoVisible = false;
   warningTimerVisible = false;
   shareVisible = false;
+  settingVisible = false;
+  soundOption: string = 'enabled';
+  timeFormatOption: string = 'default'
   tags: string[] = ['#READYTOGO', '#wishmeluck', '#nervous', '#FeelingGood', '#relieved', '#tired'];
   selectedTagIndex: number = -1;
   defaultText: string = 'Share the moment';
+  showTimeline: boolean = true;
+  countMode: boolean = false;
+  overtimeTime: number = 0;
+  showOvertime: boolean = false;
+  overtimeTimeInSeconds = 0;
+  paused: boolean = false;
+  countModeTime: number = 0;
+  overtimeSeconds: number = 0;
+  pausedSeconds: number = 0;
+  isCountdownRunning: boolean = false;
+  totalSeconds = this.getSecondsFromTime(this.countdownTime);
+  remainingSeconds = this.totalSeconds;
+  pausedArrowPosition: number = 0;
+  tagSelected: boolean = false;
+  isDefaultText: boolean = false;
+  warningTimeVisible = true;
+  editingHours: number = 0;
+  editingMinutes: number = 0;
+  editingSeconds: number = 0;
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private router: Router) {
-      this.userInputTime = this.originalCountdownTime; // 初始化为默认值
+    private router: Router,
+    private ngZone: NgZone) {
+      this.userInputTime = this.originalCountdownTime;
+      this.isDefaultText = true;
     }
 
   ngOnInit(): void {
-      // 计算第三个警告时间的进度值
   const warningTimeInSeconds2 = this.getSecondsFromTime(this.warningTime2);
   this.warningTimeProgress2 = (warningTimeInSeconds2 / this.normalTimeInSeconds) * 100;
-
-  // 计算第四个警告时间的进度值
   const warningTimeInSeconds3 = this.getSecondsFromTime(this.warningTime3);
   this.warningTimeProgress3 = (warningTimeInSeconds3 / this.normalTimeInSeconds) * 100;
-  }
-
-  toggleEditMode() {
-    this.editMode = !this.editMode;
-  }
-
-  toggleEditModeWarning() {
-    this.editModeWarning = !this.editModeWarning;
-    this.editMode = false; // 关闭原始倒计时器的编辑模式
-  }
-
-  toggleWarningEdit() {
-    this.warningEditable = !this.warningEditable;
-  }
+  } 
 
   applyUserInputTime() {
-    // 将当前 countdownTime 设置为 originalCountdownTime
     this.originalCountdownTime = this.countdownTime;
-  
-    // 获取用户输入的时间并解析为秒数，然后应用到 countdownTime 和 normalTimeInSeconds
-    const [minutes, seconds] = this.userInputTime.split(':').map(Number);
-    const totalSeconds = minutes * 60 + seconds;
-    this.countdownTime = this.getTimeFromSeconds(totalSeconds);
+    
+    // 计算总秒数
+    const totalSeconds =
+      this.editingHours * 3600 +
+      this.editingMinutes * 60 +
+      this.editingSeconds;
+    
+    // 使用字符串插值格式化时间
+    this.countdownTime = `${String(this.editingHours).padStart(2, '0')}:${String(this.editingMinutes).padStart(2, '0')}:${String(this.editingSeconds).padStart(2, '0')}`;
     this.normalTimeInSeconds = totalSeconds;
-    this.editMode = false;
     this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-    if(!this.editMode) {
+  
+    // 手动触发变更检测
+    this.cdr.detectChanges();
+  
+    if (!this.editMode) {
       this.updateProgressBar(this.normalTimeInSeconds, totalSeconds);
     }
   }
-    
-  // applyUserInputWarningTime() {
-  //   this.warningTime = this.userInputWarningTime;
-  //   this.warningTimeInSeconds = this.getSecondsFromTime(this.warningTime);
-  //   this.toggleEditModeWarning();
-  // }
+
+  // 新增函数以增加小时
+  increaseEditingHours() {
+    this.editingHours++;
+  }
+
+  // 新增函数以减少小时
+  decreaseEditingHours() {
+    if (this.editingHours > 0) {
+      this.editingHours--;
+    }
+  }
+
+  // 新增函数以增加分钟
+  increaseEditingMinutes() {
+    this.editingMinutes++;
+  }
+
+  // 新增函数以减少分钟
+  decreaseEditingMinutes() {
+    if (this.editingMinutes > 0) {
+      this.editingMinutes--;
+    }
+  }
+
+  // 新增函数以增加秒数
+  increaseEditingSeconds() {
+    this.editingSeconds++;
+  }
+
+  // 新增函数以减少秒数
+  decreaseEditingSeconds() {
+    if (this.editingSeconds > 0) {
+      this.editingSeconds--;
+    }
+  }
+  resetEditingTime() {
+    this.editingHours = 0;
+    this.editingMinutes = 0;
+    this.editingSeconds = 0;
+    this.applyUserInputTime();
+  }
+  
+  // 增加指定分钟数
+  increase5Minutes(minutesToAdd: number) {
+    this.editingMinutes += minutesToAdd;
+    this.applyUserInputTime();
+  }
+  
+  // 增加指定秒数
+  increase15Seconds(secondsToAdd: number) {
+    this.editingSeconds += secondsToAdd;
+    this.applyUserInputTime();
+  }
+
+
   applyUserInputWarningTime() {
-    // 获取用户输入的 Warning Timer 时间并解析为秒数，然后应用到 warningTime 和 warningTimeInSeconds
     const [minutes, seconds] = this.userInputWarningTime.split(':').map(Number);
     const totalSeconds = minutes * 60 + seconds;
     this.warningTime = this.getTimeFromSeconds(totalSeconds);
@@ -100,76 +162,150 @@ export class CountdownTimerComponent implements OnInit {
     this.editModeWarning = false;
     
     this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-    // 计算绿色部分的百分比
     this.updateProgressBar(this.normalTimeInSeconds, totalSeconds);
   }
 
   startCountdown() {
-    this.countdownStarted = true;
-    this.normalTimeProgress = 100;
-    this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-    this.countdownStarted = true;
-    this.timeEnded = false; // 重置时间结束标志
-    this.countdownTime = this.originalCountdownTime; // 使用原始倒计时时间
-    const totalSeconds = this.getSecondsFromTime(this.countdownTime);
-    let remainingSeconds = totalSeconds;
+    this.warningTimeVisible = false;
     const arrow = document.querySelector('.arrow') as HTMLElement;
-    // 最开始设置 transition 为 none
+    let arrowPosition = 0;
+    if (this.pausedArrowPosition !== null) {
+      arrowPosition = this.pausedArrowPosition;
+    }
+    arrow.style.left = arrowPosition + '%';
     arrow.style.transition = 'none';
-    this.intervalId = setInterval(() => { // 保存intervalId
+  
+    let totalSeconds = this.normalTimeInSeconds;
+    let remainingSeconds = totalSeconds;
+    let overtimeSeconds = 0;
+    let countModeTime = 0;
+  
+    // 使用原始格式的时间
+    this.countdownTime = this.originalCountdownTime;
+  
+    const endTimeFormat = this.getTimeBasedOnTimeFormatWithHours(totalSeconds);
+  
+    this.intervalId = setInterval(() => {
+      if (!this.countdownStarted) {
+        clearInterval(this.intervalId);
+        return;
+      }
+  
       if (remainingSeconds === 0) {
         setTimeout(() => {
           arrow.style.transition = 'none';
-          arrow.style.left = this.arrowPosition + '%';
+          if (this.showOvertime) {
+            arrow.style.left = '99.5%';
+            if (this.countMode) {
+              countModeTime = 0;
+            }
+            remainingSeconds = totalSeconds;
+            if (this.showOvertime && this.countMode) {
+              countModeTime++;
+            } else {
+              overtimeSeconds++;
+            }
+          }
         }, 2000);
       }
       if (remainingSeconds >= 0) {
         if (remainingSeconds === totalSeconds - 1) {
-          console.log('123');
-          arrow.style.left = this.arrowPosition + '%';
-          arrow.style.transition = 'left 1s linear';
+          if (!this.showOvertime) {
+            arrow.style.transition = 'left 1s linear';
+          }
+        }
+        arrowPosition = Math.min(100 - (remainingSeconds / totalSeconds) * 100, 99.5);
+        arrow.style.left = arrowPosition + '%';
+  
+        let countdownTimeDisplay = '';
+  
+        if (this.showOvertime && remainingSeconds === 0) {
+          countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(overtimeSeconds);
+          if (this.showOvertime && this.countMode) {
+            countModeTime++;
+          }
+          if (this.showOvertime) {
+            remainingSeconds = totalSeconds;
+          }
+        } else if (this.countMode) {
+          countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(countModeTime);
+          if (this.showOvertime && !this.countMode) {
+            remainingSeconds = totalSeconds;
+            arrow.style.left = arrowPosition + '%';
+          }
+          countModeTime++;
+        } else {
+          countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(remainingSeconds);
         }
   
-        this.countdownTime = this.getTimeFromSeconds(remainingSeconds);
-  
-        // 计算箭头的位置，但限制在 99.5% 以内
-        this.arrowPosition = Math.min(100 - (remainingSeconds / totalSeconds) * 100, 99.5);
-  
-        // 在此处设置箭头位置
-        arrow.style.left = this.arrowPosition + '%';
-  
-        // 更新进度条
+        this.countdownTime = countdownTimeDisplay;
         this.updateProgressBar(remainingSeconds, totalSeconds);
-  
-        // 在最后一次 tick 后禁用过渡效果
         remainingSeconds--;
-      } 
-      else {
-        clearInterval(this.intervalId); // 清除intervalId
+      } else {
+        clearInterval(this.intervalId);
         this.countdownStarted = false;
         this.timeEnded = true;
+        this.countdownTime = endTimeFormat;
+        this.countModeTime = 0;
+        this.overtimeSeconds = 0;
       }
     }, 1000);
-  } 
+  }
+  
 
+  getTimeBasedOnTimeFormatWithHours(seconds: number): string {
+    const showMinutesOnly = this.timeFormatOption === 'minutes';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+  
+    if (showMinutesOnly) {
+      return `${String((hours * 60 + minutes)).padStart(2, '0')} minutes`;
+    } else if (this.timeFormatOption === 'seconds') {
+      return seconds + ' seconds';
+    } else {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+  }
+  
+  
+  
   stopCountdown() {
     this.countdownStarted = false;
-    clearInterval(this.intervalId); // 清除intervalId
-    this.timeEnded = false; // 重置时间结束标志
-    this.countdownTime = this.originalCountdownTime; // 重置倒计时时间
-    
-    // 计算停止时绿色和黄色的比例
+    this.warningTimeVisible = true;
+    clearInterval(this.intervalId);
+    this.timeEnded = false;
+    this.countdownTime = this.originalCountdownTime;
     this.normalTimeProgress = (this.normalTimeInSeconds / this.normalTimeInSeconds) * 100;
     this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-  
-    // 更新进度条位置
     this.updateProgressBar(0, this.normalTimeInSeconds);
     const arrow = document.querySelector('.arrow') as HTMLElement;
     arrow.style.left = 0 + '%';
     arrow.style.transition = 'none';
   }
   
+  pauseCountdown() {
+    if (this.countdownStarted) {
+      this.countdownStarted = false;
+      this.pausedArrowPosition = this.arrowPosition;
+    }
+  }
 
+  resumeCountdown() {
+    if (!this.countdownStarted) {
+      this.countdownStarted = true;
+      this.startCountdown();
+    }
+  }
+
+  navigateToRateUs() {
+    window.open('https://apps.apple.com/tw/app/演講和演示計時器/id979433325', '_blank');
+  }
+
+  navigateToMoreApps() {
+    window.open('https://apps.apple.com/tw/developer/senzillo-inc/id979433324', '_blank');
+  }
+  
   private getSecondsFromTime(time: string): number {
     const [minutes, seconds] = time.split(':').map(Number);
     return minutes * 60 + seconds;
@@ -189,26 +325,147 @@ export class CountdownTimerComponent implements OnInit {
     this.warningTimerVisible = true;
   }
   showInfo() {
-    this.infoVisible = true; // 控制滑出效果
+    this.infoVisible = true;
   }
   hide() {
-    this.infoVisible = false; // 控制滑出效果
+    this.infoVisible = false;
     this.warningTimerVisible = false;
     this.shareVisible = false;
+    this.settingVisible = false;
+    this.selectedTagIndex = -1;
+    this.tagSelected = false;
+    this.warningTimeVisible = true;
+    this.showTimeline = true;
+    this.progress
+    if (this.editMode) {
+      this.applyUserInputTime(); // 将编辑的时间应用于倒计时时间
+    }
+  
+    this.editMode = false; // 确保退出编辑模式
+  
+    // 如果需要，可以在此处添加其他逻辑
+  
+    // 更新倒计时进度条和其他相关信息
+    this.updateProgressBar(this.normalTimeInSeconds, this.normalTimeInSeconds);
+  
+    this.ngZone.run(() => {
+      this.isDefaultText = true;
+    });
+    
   }
+  
   showShare() {
-    this.shareVisible = true; // 控制滑出效果
+    this.shareVisible = true;
   }
-
 
   selectTag(index: number) {
     this.selectedTagIndex = index;
+    this.isDefaultText = false;
+    this.tagSelected = true;
+  }
+  
+  get selectedTagText() {
+    if (this.selectedTagIndex === -1) {
+      this.isDefaultText = true;
+      return this.defaultText;
+    } else {
+      const selectedTag = this.tags[this.selectedTagIndex];
+      if (selectedTag === '#READYTOGO' || selectedTag === '#wishmeluck' || selectedTag === '#nervous') {
+        return `Got to do a speech! ${selectedTag}`;
+      } else if (selectedTag === '#FeelingGood' || selectedTag === '#relieved' || selectedTag === '#tired') {
+        return `Finished a speech! ${selectedTag}`;
+      } else {
+        return selectedTag;
+      }
+    }
   }
 
-  get selectedTagText() {
-    if (this.selectedTagIndex !== -1) {
-      return `Got to do a speech! ${this.tags[this.selectedTagIndex]}`;
+  showSetting() {
+    this.settingVisible = true;
+  }
+
+  shareSpeech() {
+    if (navigator.share) {
+      navigator.share({
+        url: 'https://itunes.apple.com/app/id979433325'
+      })
+      .then(() => console.log('Shared successfully.'))
     }
-    return this.defaultText; // 如果未选择标签，返回空文本
+  }
+  
+  toggleSoundOption() {
+    if (this.soundOption === 'enabled') {
+      this.soundOption = 'disabled';
+    } else if (this.soundOption === 'disabled') {
+      this.soundOption = 'chimes only';
+    } else {
+      this.soundOption = 'enabled';
+    }
+  }
+  
+  toggleTimeFormatOption() {
+    switch (this.timeFormatOption) {
+      case 'default':
+        this.timeFormatOption = 'minutes';
+        break;
+      case 'minutes':
+        this.timeFormatOption = 'seconds';
+        break;
+      case 'seconds':
+        this.timeFormatOption = 'default';
+        break;
+      default:
+        this.timeFormatOption = 'default';
+    }
+  }
+  
+
+  toggleTimeline() {
+    this.showTimeline = !this.showTimeline;
+    this.cdr.detectChanges();
+  }
+
+  toggleCountMode() {
+    this.countMode = !this.countMode;
+    this.cdr.detectChanges();
+  }
+
+  toggleOvertime() {
+    this.showOvertime = !this.showOvertime;
+    this.cdr.detectChanges();
+  }
+
+  toggleEditMode() {
+    this.editMode = !this.editMode;
+    this.warningTimeVisible = false;
+    this.showTimeline = false;
+    if (this.editMode) {
+      // 进入编辑模式时，将编辑属性设置为 countdownTime 的值
+      const [hours, minutes, seconds] = this.countdownTime.split(':').map(Number);
+      this.editingHours = hours || 0; // 如果没有小时，则默认为0
+      this.editingMinutes = minutes || 0; // 如果没有分钟，则默认为0
+      this.editingSeconds = seconds || 0; // 如果没有秒，则默认为0
+    }
+    
+  }
+  
+
+  toggleEditModeWarning() {
+    this.editModeWarning = !this.editModeWarning;
+    this.editMode = false;
+  }
+
+  toggleWarningEdit() {
+    this.warningEditable = !this.warningEditable;
+  }
+
+  toggleCountdown() {
+    if (this.isCountdownRunning) {
+      this.pauseCountdown();
+      this.isCountdownRunning = false;
+    } else {
+      this.resumeCountdown();
+      this.isCountdownRunning = true;
+    }
   }
 }

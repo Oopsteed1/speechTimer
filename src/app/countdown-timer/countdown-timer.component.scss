@@ -1,13 +1,13 @@
 .countdown-container {
   text-align: center;
   margin-top: 20px;
-  
+  z-index: 1;
   .countdownTimer {
     height: 700px;
   }
   .countdownTimer,
   .inputCountdownTimer {
-    font-size: 500px;
+    font-size: 20vw;
     font-weight: 550;
     margin: 10px;
     border-radius: 50px;
@@ -49,28 +49,22 @@
     height: 30px;
     background-color: lightgray;
     margin-top: 10px;
-
     .progress-bar {
       position: absolute;
       left: 0;
       height: 100%;
       background-color: yellow;
     }
-
     .progress-bar-yellow {
       position: absolute;
       height: 100%;
       background-color: green;
     }
-
-      /* 第三个警告时间的样式（橘色） */
     .progress-bar-orange {
       height: 100%;
       background-color: orange;
       position: absolute;
     }
-
-    /* 第四个警告时间的样式（红色） */
     .progress-bar-red {
       background-color: red;
       position: absolute;
@@ -78,14 +72,14 @@
     }
     .arrow {
       position: absolute;
-      top: 30px; /* 调整箭头的位置 */
+      top: 30px;
       left: calc(100% - 10px);
       width: 0;
       height: 0;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 15px solid #FFF; /* 红色箭头，可以根据需要更改颜色 */
-      transition: left 1s linear; /* 添加过渡效果 */
+      border-bottom: 15px solid #FFF; 
+      transition: left 1s linear;
     }
   }
   .buttons {
@@ -93,12 +87,12 @@
     justify-content: space-between;
     align-items: center;
     .buttonImage {
-      cursor: pointer; /* 添加手型光标以指示可单击 */
-      margin: 30px; /* 可选：添加一些间距 */
+      cursor: pointer;
+      margin: 30px;
       width: 90px;
       &.disabled {
-        pointer-events: none; /* 阻止点击事件 */
-        opacity: 0.1; /* 添加透明度以指示禁用状态 */
+        pointer-events: none;
+        opacity: 0.1;
       }
       &.started {
         opacity: 0.6;
@@ -115,7 +109,7 @@
     display: flex;
     justify-content: center;
     width: 33.3%;
-    font-size: 200px;
+    font-size: 10vw;
     font-weight: 550;
     margin: 10px;
     border-radius: 50px;
@@ -142,15 +136,16 @@
 .slide-up {
   animation: slide-up 0.5s ease forwards;
   opacity: 0;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   transform: translate(-50%, -50%);
-  background: #272727; /* 内容容器的背景色 */
+  background: #272727;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 阴影效果，可根据需要自定义 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   width: 100%;
-  height: 100%;
+  height: 124%;
+  z-index: 5;
   @keyframes slide-up {
     from {
       transform: translateY(100%);
@@ -174,8 +169,21 @@
       margin-bottom: 50px;
       font-weight: 500;
     }
+    .share-button {
+      display: flex;
+      justify-content: center;
+      margin-top: 100px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      &:hover {
+        transform: scale(1.1);
+      }
+      .shareIcon {
+        width: 150px;
+      }
+    }
     .content {
-      font-size: 105px;
+      font-size: 4vw;
       padding: 0 100px;
     }
     .close {
@@ -208,11 +216,10 @@
         transition: transform 0.3s ease;
         background-color: #333;
         &:hover {
-          transform: scale(1.1); /* 在悬停时放大按钮 */
+          transform: scale(1.1);
         }
       }
     }
-
     .tagContent {
       display: flex;
       justify-content: center;
@@ -225,25 +232,79 @@
         width: 99%;
         margin-bottom: 100px;
       }
+      .defaultText {
+        background-color: #777;
+        color: #000;
+      }
     }
     .tagButtonContent {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      grid-gap: 10px; /* 指定按钮之间的间隔 */
-      margin: 0 auto; /* 居中对齐 */
+      grid-gap: 10px;
+      margin: 0 auto;
       .tag-button {
         padding: 10px;
         background-color: #333;
         border: 1px solid #333;
         cursor: pointer;
         border-radius: 100px;
-        width: 760px;
+        max-width: 760px;
+        margin: 10px;
         height: 100px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 100px;
+        font-size: 5vw;
       }
+    }
+    .countdownTimer {
+      height: 1000px;
+      font-size: 23vw;
+      display: flex;
+      flex-direction: column;
+      .timeButtons {
+        display: flex;
+        justify-content: space-between;
+        font-size: 3vw;
+        width: 78%;
+        margin-left: 100px;
+        margin-top: 50px;
+        .hours,
+        .minutes,
+        .seconds {
+          border-radius: 50px;
+          width: 250px;
+        }
+        .hours {
+          background-color: #750000;
+          color: #FFF;
+        }
+        .minutes,
+        .seconds {
+          background-color: #555;
+          color: #FFF;
+        }
+      }
+      .editing-controls {
+      display: flex;
+      .timeContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .time {
+          border-bottom: 1px solid #FFF;
+          border-top: 1px solid #FFF;
+        }
+        .arrowContainer {
+          display: flex;
+          .arrow-up,
+          .arrow-down { 
+            width: 100px;
+            height: 100px;
+          }
+        }
+      }
+     } 
     }
   }
   .warning-timer-container {
@@ -256,7 +317,7 @@
     }
     .time {
       text-align: center;
-      font-size: 850px;
+      font-size: 35vw;
       color: orange;
       font-weight: 600;
       padding: 0;
@@ -275,37 +336,31 @@
   
       .progress-bar {
         height: 100%;
-        width: 50%; /* 绿色部分占比 50% */
+        width: 50%;
         background-color: green;
         transition: width 0.5s ease-in-out;
         position: absolute;
         z-index: 4;
       }
-    
-      /* 黄色部分 */
       .progress-bar-yellow {
         height: 100%;
-        width: 75%; /* 黄色部分占比 25% */
+        width: 75%;
         background-color: yellow;
         transition: width 0.5s ease-in-out;
         position: absolute;
         z-index: 3;
       }
-    
-      /* 橙色部分 */
       .progress-bar-orange {
         height: 100%;
-        width: 90%; /* 橙色部分占比 15% */
+        width: 90%;
         background-color: orange;
         transition: width 0.5s ease-in-out;
         position: absolute;
         z-index: 2;
       }
-    
-      /* 红色部分 */
       .progress-bar-red {
         height: 100%;
-        width: 100%; /* 红色部分占比 10% */
+        width: 100%;
         background-color: red;
         transition: width 0.5s ease-in-out;
         position: absolute;
@@ -313,14 +368,14 @@
       }
       .arrow {
         position: absolute;
-        top: 30px; /* 调整箭头的位置 */
+        top: 30px;
         left: 74.6% !important;
         width: 0;
         height: 0;
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
-        border-bottom: 15px solid #FFF; /* 红色箭头，可以根据需要更改颜色 */
-        transition: left 1s linear; /* 添加过渡效果 */
+        border-bottom: 15px solid #FFF;
+        transition: left 1s linear;
       }
     }
     .back {
@@ -350,7 +405,7 @@
         font-size: 22px;
         transition: transform 0.3s ease;
         &:hover {
-          transform: scale(1.1); /* 在悬停时放大按钮 */
+          transform: scale(1.1);
         }
       }
       .restore-button {
@@ -358,6 +413,63 @@
       }
       .upgrade-button {
         background-color: #999;
+      }
+    }
+  }
+  .optionContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 300px;
+    .options {
+      display: flex;
+      font-size: 5vw;
+      max-width: 1300px;
+      height: 150px;
+      .subtitle {
+        max-width: 1000px;
+        width: 100%;
+        min-width: 400px;
+      }
+      .option-button {
+        cursor: pointer;
+        text-wrap: nowrap;
+      }
+      .disabled {
+        color : #555;
+      }
+      .enabled {
+        color: #FFF;
+      }
+      .chimes-only {
+        color : orange;
+      }
+      .toggleButton {
+        width: 150px;
+      }
+      .green-arrow {
+        width: 0;
+        height: 0;
+        border-left: 30px solid transparent;
+        border-right: 30px solid transparent;
+        border-bottom: 60px solid green;
+        transition: color 0.3s;
+        margin: 20px 0 0 50px;
+        &:active {
+          border-bottom: 60px solid red;
+        }
+      }
+      .orange-arrow {
+        width: 0;
+        height: 0;
+        border-left: 30px solid transparent;
+        border-right: 30px solid transparent;
+        border-top: 60px solid orange;
+        transition: color 0.3s;
+        margin: 20px 0 0 50px;
+        &:active {
+          border-top: 60px solid red;
+        }
       }
     }
   }

@@ -1,9 +1,50 @@
-<div class="countdown-container">
-  <div *ngIf="!editMode" (click)="toggleEditMode()" class="countdownTimer">{{ countdownTime }}</div>
-  <div *ngIf="editMode" class="countdownTimer">
-    <input type="text" [(ngModel)]="userInputTime" (focusout)="applyUserInputTime()" class="inputCountdownTimer"/>
-  </div>
-  <div class="warning-container">
+<div class="countdown-container" *ngIf="!shareVisible && !infoVisible && !settingVisible && !warningTimerVisible">
+  <div *ngIf="!editMode; else countdownEditmode" (click)="toggleEditMode()" class="countdownTimer">{{ countdownTime }}</div>
+  <!--countdown editmode-->
+  <ng-template #countdownEditmode>
+    <div class="slide-up">
+      <div class="content-container">
+        <button class="close" (click)=" hide()">X</button>
+        <div *ngIf="editMode" class="countdownTimer">
+          <div class="editing-controls">
+            <div class="timeContainer">
+              <span (click)="increaseEditingHours()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+              </span>
+              <span class="time">{{ editingHours | number:'2.0-0' }}:</span>
+              <span (click)="decreaseEditingHours()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+              </span>
+            </div>
+            <div class="timeContainer">
+              <span (click)="increaseEditingMinutes()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+              </span>
+              <span class="time">{{ editingMinutes | number:'2.0-0' }}:</span>
+              <span (click)="decreaseEditingMinutes()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+              </span>
+            </div>
+            <div class="timeContainer">
+              <span (click)="increaseEditingSeconds()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+              </span>
+              <span class="time">{{ editingSeconds | number:'2.0-0' }} </span>
+              <span (click)="decreaseEditingSeconds()" class="arrowContainer">
+                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+              </span>
+            </div>
+          </div>
+          <div class="timeButtons">
+            <div (click)="resetEditingTime()" class="hours">00:00</div>
+            <div (click)="increase5Minutes(5)" class="minutes">+05m</div>
+            <div (click)="increase15Seconds(15)" class="seconds">+15s</div>
+          </div>
+        </div>
+      </div>
+    </div>    
+  </ng-template>
+  <div class="warning-container" *ngIf="warningTimeVisible">
     <div *ngIf="!editModeWarning" (click)="toggleEditModeWarning()" class="warningTimer">{{ warningTime }}</div>
     <div *ngIf="editModeWarning" class="warningTimer">
       <input type="text" [(ngModel)]="userInputWarningTime" (focusout)="applyUserInputWarningTime()"  class="inputWarningTimer"/>
@@ -11,22 +52,19 @@
     <div (click)="showWarningTimer()" class="warningTimer">
       <img src="../../assets/icon/orangeLock.png" class="warningTimerIcon">
     </div>
-    <div (click)="showWarningTimer()" class="warningTimer" >
+    <div (click)="showWarningTimer()" class="warningTimer">
       <img src="../../assets/icon/redLock.png" class="warningTimerIcon">
     </div>
   </div>
-  <div class="progress-container">
-    <!-- 一般计时器的进度条 -->
+  <div class="progress-container" *ngIf="showTimeline">
     <div class="progress-bar" [style.width.%]="normalTimeProgress"></div>
-    <!-- Warning Time 计时器的进度条 -->
     <div class="progress-bar-yellow" [style.width.%]="warningTimeProgress"></div>
-
     <div class="arrow" [style.left.%]="arrowPosition"></div>
   </div>
-  <div class="buttons">
+  <div class="buttons" *ngIf="showTimeline">
     <img src="../../assets/icon/infoIcon.png" class="buttonImage" [class.disabled]="countdownStarted" (click)="showInfo()">
-    <img src="../../assets/icon/settingIcon.png" class="buttonImage" [class.disabled]="countdownStarted">
-    <img [src]="countdownStarted || editMode ? '../../assets/icon/pause.png' : '../../assets/icon/playIcon.png'" class="buttonImage" [class.started]="countdownStarted" (click)="startCountdown()">
+    <img src="../../assets/icon/settingIcon.png" class="buttonImage" [class.disabled]="countdownStarted" (click)="showSetting()">
+    <img [src]="countdownStarted ? '../../assets/icon/pause.png' : '../../assets/icon/playIcon.png'" class="buttonImage" [class.started]="countdownStarted" (click)="toggleCountdown()">
     <img src="../../assets/icon/returnIcon.png" class="buttonImage" [class.started]="countdownStarted" (click)="stopCountdown()">
     <img src="../../assets/icon/shareIcon.png" class="buttonImage" [class.disabled]="countdownStarted"(click)="showShare()">
   </div>
@@ -39,24 +77,15 @@
     <p class="subtitle">Get all 3 Warning Times!</p>
     <p class="time">01:15</p>
     <div class="progress-container">
-      <!-- 绿色进度条 -->
       <div class="progress-bar"></div>
-      <!-- 黄色进度条 -->
       <div class="progress-bar-yellow"></div>
-      <!-- 橙色进度条 -->
       <div class="progress-bar-orange"></div>
-      <!-- 红色进度条 -->
       <div class="progress-bar-red"></div>
-
-      <!-- 箭头 -->
       <div class="arrow" [style.left.%]="arrowPosition"></div>
     </div>
 
     <div class="buttons">
-      <!-- Restore 按钮 -->
       <button class="restore-button">restore</button>
-
-      <!-- Upgrade 按钮 -->
       <button class="upgrade-button">upgrade</button>
     </div>
     <button class="back" (click)="hide()">X</button>
@@ -76,8 +105,8 @@
     <div class="content">count up & down, 3 times formats and up to 3</div>
     <div class="content">warn times!</div>
     <div class="infoButtons">
-      <button class="rate-button">rate us!</button>
-      <button class="app-button">more apps</button>
+      <button class="rate-button" (click)="navigateToRateUs()">rate Us!</button>
+      <button class="app-button" (click)="navigateToMoreApps()">more apps</button>
     </div>
   </div>
 </div>
@@ -88,11 +117,51 @@
     <div class="title">share</div> 
     <button class="close" (click)="hide()">X</button>
     <div class="tagContent">
-      <div class="tag-text">{{ selectedTagText }}</div>
+      <div class="tag-text" [ngClass]="{'defaultText': isDefaultText }">{{ selectedTagText }}</div>
     </div>
     <div class="tagButtonContent">
       <div class="tag-button" *ngFor="let tag of tags; let i = index" (click)="selectTag(i)">{{ tag }}</div>
     </div>
+    <div *ngIf="tagSelected" class="share-button" (click)="shareSpeech()">
+      <img src="../../assets/icon/accept.png" class="shareIcon">
+    </div>
   </div>
+</div>
+
+<!-- Setting-->
+<div class="slide-up" *ngIf="settingVisible">
+  <div class="content-container">
+    <div class="title">options</div> 
+    <button class="close" (click)="hide()">X</button>
+    <div class="content">
+      <div class="optionContent">
+        <div class="options">
+          <div class="subtitle">sound</div>
+          <div class="option-button" [class.enabled]="soundOption === 'enabled'" [class.disabled]="soundOption === 'disabled'" [class.chimes-only]="soundOption === 'chimes only'" (click)="toggleSoundOption()">{{ soundOption }}</div>
+        </div>
+        <div class="options">
+          <div class="subtitle">timeline</div>
+          <div (click)="toggleTimeline()">
+            <img [src]="showTimeline ? '../../assets/icon/switchOn.png' : '../../assets/icon/switchOff.png'" class="toggleButton">
+          </div>
+        </div>
+        <div class="options">
+          <div class="subtitle">overtime</div>
+          <div (click)="toggleOvertime()">
+            <img [src]="showOvertime ? '../../assets/icon/switchOn.png' : '../../assets/icon/switchOff.png'" class="toggleButton">
+          </div>
+        </div>
+        <div class="options">
+          <div class="subtitle">count mode</div>
+          <div (click)="toggleCountMode()">
+            <div [ngClass]="countMode ? 'green-arrow' : 'orange-arrow'" class="toggleButton"></div>
+          </div>                   
+        </div>
+        <div class="options">
+          <div class="subtitle">time format</div>
+          <div class="option-button" (click)="toggleTimeFormatOption()">{{ timeFormatOption }}</div>
+        </div>
+      </div>
+    </div>
 </div>
 

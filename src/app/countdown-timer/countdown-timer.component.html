@@ -15,29 +15,29 @@
             <div class="editing-controls">
               <div class="timeContainer">
                 <span (click)="increaseEditingHours()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                 </span>
                 <span class="time">{{ editingHours | number:'2.0-0' }}:</span>
                 <span (click)="decreaseEditingHours()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                 </span>
               </div>
               <div class="timeContainer">
                 <span (click)="increaseEditingMinutes()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                 </span>
                 <span class="time">{{ editingMinutes | number:'2.0-0' }}:</span>
                 <span (click)="decreaseEditingMinutes()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                 </span>
               </div>
               <div class="timeContainer">
                 <span (click)="increaseEditingSeconds()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                 </span>
                 <span class="time">{{ editingSeconds | number:'2.0-0' }} </span>
                 <span (click)="decreaseEditingSeconds()" class="arrowContainer">
-                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                 </span>
               </div>
             </div>
@@ -48,10 +48,10 @@
             </div>
           </div>
         </div>
-      </div>    
+      </div>
     </ng-template>
   </div>
-  
+
   <div class="warning-container" *ngIf="warningTimeVisible">
     <div class="warningTimerContainer">
       <div *ngIf="!editModeWarning else warningEditmode" (click)="toggleEditModeWarning()" class="warningTimer" [class.hashours]="showHours" [class.nohours]="!showHours" >{{ warningTime }}</div>
@@ -65,29 +65,29 @@
               <div class="editing-controls">
                 <div class="timeContainer">
                   <span (click)="increaseEditingWarningHours()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                    <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                   </span>
                   <span class="time">{{ editingWarningHours | number:'2.0-0' }}:</span>
                   <span (click)="decreaseEditingWarningHours()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                    <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                   </span>
                 </div>
                 <div class="timeContainer">
                   <span (click)="increaseEditingWarningMinutes()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                    <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                   </span>
                   <span class="time">{{ editingWarningMinutes | number:'2.0-0' }}:</span>
                   <span (click)="decreaseEditingWarningMinutes()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                    <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                   </span>
                 </div>
                 <div class="timeContainer">
                   <span (click)="increaseEditingWarningSeconds()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                    <img src="../speechTimer/assets/icon/arrow-up.png" class="arrow-up">
                   </span>
                   <span class="time">{{ editingWarningSeconds | number:'2.0-0' }} </span>
                   <span (click)="decreaseEditingWarningSeconds()" class="arrowContainer">
-                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                    <img src="../speechTimer/assets/icon/arrow-down.png" class="arrow-down">
                   </span>
                 </div>
               </div>
@@ -98,13 +98,13 @@
               </div>
             </div>
           </div>
-        </div>    
+        </div>
       </ng-template>
       <div (click)="showWarningTimer()" class="warningTimer" *ngIf="!editModeWarning">
-        <img src="../../assets/icon/orangeLock.png" class="warningTimerIcon">
+        <img src="../speechTimer/assets/icon/orangeLock.png" class="warningTimerIcon">
       </div>
       <div (click)="showWarningTimer()" class="warningTimer" *ngIf="!editModeWarning">
-        <img src="../../assets/icon/redLock.png" class="warningTimerIcon">
+        <img src="../speechTimer/assets/icon/redLock.png" class="warningTimerIcon">
       </div>
     </div>
   </div>
@@ -114,11 +114,11 @@
     <div class="arrow" [style.left.%]="arrowPosition"></div>
   </div>
   <div class="buttons" *ngIf="showButtons && !editModeWarning && !editMode">
-    <img src="../../assets/icon/infoIcon.png" class="buttonImage infoIcon" [class.disabled]="countdownStarted" (click)="showInfo()">
-    <img src="../../assets/icon/settingIcon.png" class="buttonImage settingIcon" [class.disabled]="countdownStarted" (click)="showSetting()">
-    <img [src]="countdownStarted ? '../../assets/icon/pause.png' : '../../assets/icon/playIcon.png'" class="buttonImage pauseIcon" [class.started]="countdownStarted" (click)="toggleCountdown()">
-    <img src="../../assets/icon/returnIcon.png" class="buttonImage returnIcon" [class.started]="countdownStarted" (click)="stopCountdown()">
-    <img src="../../assets/icon/shareIcon.png" class="buttonImage shareIcon" [class.disabled]="countdownStarted"(click)="showShare()">
+    <img src="../speechTimer/assets/icon/infoIcon.png" class="buttonImage infoIcon" [class.disabled]="countdownStarted" (click)="showInfo()">
+    <img src="../speechTimer/assets/icon/settingIcon.png" class="buttonImage settingIcon" [class.disabled]="countdownStarted" (click)="showSetting()">
+    <img [src]="countdownStarted ? '../speechTimer/assets/icon/pause.png' : '../speechTimer/assets/icon/playIcon.png'" class="buttonImage pauseIcon" [class.started]="countdownStarted" (click)="toggleCountdown()">
+    <img src="../speechTimer/assets/icon/returnIcon.png" class="buttonImage returnIcon" [class.started]="countdownStarted" (click)="stopCountdown()">
+    <img src="../speechTimer/assets/icon/shareIcon.png" class="buttonImage shareIcon" [class.disabled]="countdownStarted"(click)="showShare()">
   </div>
 </div>
 
@@ -166,7 +166,7 @@
 <!-- Share-->
 <div class="slide-up" *ngIf="shareVisible">
   <div class="content-container">
-    <div class="title">share</div> 
+    <div class="title">share</div>
     <button class="close" (click)="hide()">X</button>
     <div class="tagContent">
       <div class="tag-text" [ngClass]="{'defaultText': isDefaultText }">{{ selectedTagText }}</div>
@@ -175,7 +175,7 @@
       <div class="tag-button" *ngFor="let tag of tags; let i = index" (click)="selectTag(i)">{{ tag }}</div>
     </div>
     <div *ngIf="tagSelected" class="share-button" (click)="shareSpeech()">
-      <img src="../../assets/icon/accept.png" class="shareIcon">
+      <img src="../speechTimer/assets/icon/accept.png" class="shareIcon">
     </div>
   </div>
 </div>
@@ -183,7 +183,7 @@
 <!-- Setting-->
 <div class="slide-up" *ngIf="settingVisible">
   <div class="content-container">
-    <div class="title">options</div> 
+    <div class="title">options</div>
     <button class="close" (click)="hide()">X</button>
     <div class="content">
       <div class="optionContent">
@@ -194,20 +194,20 @@
         <div class="options">
           <div class="subtitle">timeline</div>
           <div (click)="toggleTimeline()">
-            <img [src]="showTimeline ? '../../assets/icon/switchOn.png' : '../../assets/icon/switchOff.png'" class="toggleButton">
+            <img [src]="showTimeline ? '../speechTimer/assets/icon/switchOn.png' : '../speechTimer/assets/icon/switchOff.png'" class="toggleButton">
           </div>
         </div>
         <div class="options">
           <div class="subtitle">overtime</div>
           <div (click)="toggleOvertime()">
-            <img [src]="showOvertime ? '../../assets/icon/switchOn.png' : '../../assets/icon/switchOff.png'" class="toggleButton">
+            <img [src]="showOvertime ? '../speechTimer/assets/icon/switchOn.png' : '../speechTimer/assets/icon/switchOff.png'" class="toggleButton">
           </div>
         </div>
         <div class="options">
           <div class="subtitle">count mode</div>
           <div (click)="toggleCountMode()">
             <div [ngClass]="countMode ? 'green-arrow' : 'orange-arrow'" class="toggleButton"></div>
-          </div>                   
+          </div>
         </div>
         <div class="options">
           <div class="subtitle">time format</div>

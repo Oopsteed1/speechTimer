@@ -1,5 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, Renderer2, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-countdown-timer',
@@ -47,7 +48,7 @@ export class CountdownTimerComponent implements OnInit {
   overtimeTime: number = 0;
   showOvertime: boolean = false;
   overtimeTimeInSeconds = 0;
-  paused: boolean = false;
+  paused: boolean = true;
   countModeTime: number = 0;
   overtimeSeconds: number = 0;
   pausedSeconds: number = 0;
@@ -61,11 +62,15 @@ export class CountdownTimerComponent implements OnInit {
   editingHours: number = 0;
   editingMinutes: number = 0;
   editingSeconds: number = 0;
+  editingWarningHours: number = 0;
+  editingWarningMinutes: number = 0;
+  editingWarningSeconds: number = 0;
+  showButtons = true;
+  showHours = false;
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private router: Router,
-    private ngZone: NgZone) {
+    private ngZone: NgZone,) {
       this.userInputTime = this.originalCountdownTime;
       this.isDefaultText = true;
     }
@@ -79,56 +84,69 @@ export class CountdownTimerComponent implements OnInit {
 
   applyUserInputTime() {
     this.originalCountdownTime = this.countdownTime;
-    
-    // 计算总秒数
     const totalSeconds =
       this.editingHours * 3600 +
       this.editingMinutes * 60 +
       this.editingSeconds;
-    
-    // 使用字符串插值格式化时间
-    this.countdownTime = `${String(this.editingHours).padStart(2, '0')}:${String(this.editingMinutes).padStart(2, '0')}:${String(this.editingSeconds).padStart(2, '0')}`;
+      
+    if (this.editingHours > 0) {
+        this.showHours = true
+    }
+    this.countdownTime = this.getTimeFromSeconds(totalSeconds);
     this.normalTimeInSeconds = totalSeconds;
     this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-  
-    // 手动触发变更检测
-    this.cdr.detectChanges();
-  
     if (!this.editMode) {
       this.updateProgressBar(this.normalTimeInSeconds, totalSeconds);
     }
   }
-
-  // 新增函数以增加小时
-  increaseEditingHours() {
-    this.editingHours++;
-  }
-
-  // 新增函数以减少小时
-  decreaseEditingHours() {
-    if (this.editingHours > 0) {
-      this.editingHours--;
+  
+  applyUserInputWarningTime() {
+    if (this.editModeWarning) {
+      const [minutes, seconds] = this.userInputWarningTime.split(':').map(Number);
+      const totalSeconds =       
+      this.editingWarningHours * 3600 +
+      this.editingWarningMinutes * 60 +
+      this.editingWarningSeconds;
+      
+      if (this.editingWarningHours > 0) {
+        this.showHours = true
+      }
+      this.warningTime = this.getTimeFromSeconds(totalSeconds);
+      this.warningTimeInSeconds = totalSeconds;
+      this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
+      this.updateProgressBar(this.normalTimeInSeconds, totalSeconds);
     }
   }
+  increaseEditingHours() {
+    this.editingHours++;
+    if (this.editingHours > 0) {
+      this.showHours = true
+    }
+    this.cdr.detectChanges(); 
+  }
 
-  // 新增函数以增加分钟
+  decreaseEditingHours() {
+  if (this.editingHours > 0) {
+    this.editingHours--;
+    this.showHours = true
+  }
+  this.cdr.detectChanges(); 
+}
+
   increaseEditingMinutes() {
     this.editingMinutes++;
   }
 
-  // 新增函数以减少分钟
   decreaseEditingMinutes() {
     if (this.editingMinutes > 0) {
       this.editingMinutes--;
     }
   }
 
-  // 新增函数以增加秒数
   increaseEditingSeconds() {
     this.editingSeconds++;
   }
 
-  // 新增函数以减少秒数
   decreaseEditingSeconds() {
     if (this.editingSeconds > 0) {
       this.editingSeconds--;
@@ -141,28 +159,68 @@ export class CountdownTimerComponent implements OnInit {
     this.applyUserInputTime();
   }
   
-  // 增加指定分钟数
   increase5Minutes(minutesToAdd: number) {
     this.editingMinutes += minutesToAdd;
     this.applyUserInputTime();
   }
-  
-  // 增加指定秒数
+
   increase15Seconds(secondsToAdd: number) {
     this.editingSeconds += secondsToAdd;
     this.applyUserInputTime();
   }
 
 
-  applyUserInputWarningTime() {
-    const [minutes, seconds] = this.userInputWarningTime.split(':').map(Number);
-    const totalSeconds = minutes * 60 + seconds;
-    this.warningTime = this.getTimeFromSeconds(totalSeconds);
-    this.warningTimeInSeconds = totalSeconds;
-    this.editModeWarning = false;
-    
-    this.warningTimeProgress = (this.warningTimeInSeconds / this.normalTimeInSeconds) * 100;
-    this.updateProgressBar(this.normalTimeInSeconds, totalSeconds);
+  increaseEditingWarningHours() {
+    this.editingWarningHours++;
+    if (this.editingWarningHours > 0) {
+      this.showHours = true
+    }
+    this.cdr.detectChanges(); 
+  }
+
+  decreaseEditingWarningHours() {
+    if (this.editingWarningHours > 0) {
+      this.editingWarningHours--;
+      this.showHours = true
+    }
+    this.cdr.detectChanges(); 
+  }
+
+  increaseEditingWarningMinutes() {
+    this.editingWarningMinutes++;
+  }
+
+  decreaseEditingWarningMinutes() {
+    if (this.editingWarningMinutes > 0) {
+      this.editingWarningMinutes--;
+    }
+  }
+
+  increaseEditingWarningSeconds() {
+    this.editingWarningSeconds++;
+  }
+
+  decreaseEditingWarningSeconds() {
+    if (this.editingWarningSeconds > 0) {
+      this.editingWarningSeconds--;
+    }
+  }
+
+  resetEditingWarningTime() {
+    this.editingWarningHours = 0;
+    this.editingWarningMinutes = 0;
+    this.editingWarningSeconds = 0;
+    this.applyUserInputWarningTime();
+  }
+
+  increaseWarning5Minutes(minutesToAdd: number) {
+    this.editingWarningMinutes += minutesToAdd;
+    this.applyUserInputWarningTime();
+  }
+
+  increaseWarning15Seconds(secondsToAdd: number) {
+    this.editingWarningSeconds += secondsToAdd;
+    this.applyUserInputWarningTime();
   }
 
   startCountdown() {
@@ -174,52 +232,45 @@ export class CountdownTimerComponent implements OnInit {
     }
     arrow.style.left = arrowPosition + '%';
     arrow.style.transition = 'none';
-  
+
     let totalSeconds = this.normalTimeInSeconds;
     let remainingSeconds = totalSeconds;
     let overtimeSeconds = 0;
     let countModeTime = 0;
-  
-    // 使用原始格式的时间
+    let countdownFromOvertime = false;
+
     this.countdownTime = this.originalCountdownTime;
-  
     const endTimeFormat = this.getTimeBasedOnTimeFormatWithHours(totalSeconds);
-  
+
     this.intervalId = setInterval(() => {
       if (!this.countdownStarted) {
         clearInterval(this.intervalId);
         return;
       }
-  
       if (remainingSeconds === 0) {
-        setTimeout(() => {
-          arrow.style.transition = 'none';
-          if (this.showOvertime) {
-            arrow.style.left = '99.5%';
-            if (this.countMode) {
-              countModeTime = 0;
-            }
-            remainingSeconds = totalSeconds;
-            if (this.showOvertime && this.countMode) {
-              countModeTime++;
-            } else {
-              overtimeSeconds++;
-            }
-          }
-        }, 2000);
+        if (this.showOvertime) {
+          countdownFromOvertime = true;
+          arrow.style.transition = 'left 1s linear';
+        } else {
+          clearInterval(this.intervalId);
+          this.countdownStarted = false;
+        }
+        arrow.style.left = '99.5%';
+        overtimeSeconds = 0;
       }
+
       if (remainingSeconds >= 0) {
-        if (remainingSeconds === totalSeconds - 1) {
-          if (!this.showOvertime) {
+        if (!countdownFromOvertime) {
+          if (remainingSeconds === totalSeconds - 1) {
             arrow.style.transition = 'left 1s linear';
           }
+          arrowPosition = Math.min(100 - (remainingSeconds / totalSeconds) * 100, 99.5);
+          arrow.style.left = arrowPosition + '%';
         }
-        arrowPosition = Math.min(100 - (remainingSeconds / totalSeconds) * 100, 99.5);
-        arrow.style.left = arrowPosition + '%';
-  
+
         let countdownTimeDisplay = '';
-  
-        if (this.showOvertime && remainingSeconds === 0) {
+
+        if (countdownFromOvertime) {
           countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(overtimeSeconds);
           if (this.showOvertime && this.countMode) {
             countModeTime++;
@@ -227,6 +278,7 @@ export class CountdownTimerComponent implements OnInit {
           if (this.showOvertime) {
             remainingSeconds = totalSeconds;
           }
+          overtimeSeconds++;
         } else if (this.countMode) {
           countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(countModeTime);
           if (this.showOvertime && !this.countMode) {
@@ -237,7 +289,7 @@ export class CountdownTimerComponent implements OnInit {
         } else {
           countdownTimeDisplay = this.getTimeBasedOnTimeFormatWithHours(remainingSeconds);
         }
-  
+
         this.countdownTime = countdownTimeDisplay;
         this.updateProgressBar(remainingSeconds, totalSeconds);
         remainingSeconds--;
@@ -251,6 +303,8 @@ export class CountdownTimerComponent implements OnInit {
       }
     }, 1000);
   }
+
+
   
 
   getTimeBasedOnTimeFormatWithHours(seconds: number): string {
@@ -273,6 +327,7 @@ export class CountdownTimerComponent implements OnInit {
   stopCountdown() {
     this.countdownStarted = false;
     this.warningTimeVisible = true;
+    this.isCountdownRunning = false;
     clearInterval(this.intervalId);
     this.timeEnded = false;
     this.countdownTime = this.originalCountdownTime;
@@ -310,11 +365,18 @@ export class CountdownTimerComponent implements OnInit {
     const [minutes, seconds] = time.split(':').map(Number);
     return minutes * 60 + seconds;
   }
-
+  
+  
   private getTimeFromSeconds(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  
+    if (hours > 0) {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    } else {
+      return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
   }
 
   private updateProgressBar(remainingSeconds: number, totalSeconds: number) {
@@ -335,17 +397,16 @@ export class CountdownTimerComponent implements OnInit {
     this.selectedTagIndex = -1;
     this.tagSelected = false;
     this.warningTimeVisible = true;
-    this.showTimeline = true;
-    this.progress
+    this.showButtons = true;
     if (this.editMode) {
-      this.applyUserInputTime(); // 将编辑的时间应用于倒计时时间
+      this.applyUserInputTime();
+      this.editMode = false;
     }
   
-    this.editMode = false; // 确保退出编辑模式
-  
-    // 如果需要，可以在此处添加其他逻辑
-  
-    // 更新倒计时进度条和其他相关信息
+    if (this.editModeWarning) {
+      this.applyUserInputWarningTime();
+      this.editModeWarning = false;
+    }
     this.updateProgressBar(this.normalTimeInSeconds, this.normalTimeInSeconds);
   
     this.ngZone.run(() => {
@@ -440,11 +501,10 @@ export class CountdownTimerComponent implements OnInit {
     this.warningTimeVisible = false;
     this.showTimeline = false;
     if (this.editMode) {
-      // 进入编辑模式时，将编辑属性设置为 countdownTime 的值
       const [hours, minutes, seconds] = this.countdownTime.split(':').map(Number);
-      this.editingHours = hours || 0; // 如果没有小时，则默认为0
-      this.editingMinutes = minutes || 0; // 如果没有分钟，则默认为0
-      this.editingSeconds = seconds || 0; // 如果没有秒，则默认为0
+      this.editingHours = hours || 0;
+      this.editingMinutes = minutes || 0; 
+      this.editingSeconds = seconds || 0;
     }
     
   }

@@ -2,9 +2,7 @@
   text-align: center;
   margin-top: 20px;
   z-index: 1;
-  .countdownTimer {
-    height: 700px;
-  }
+
   .countdownTimer,
   .inputCountdownTimer {
     font-size: 20vw;
@@ -18,8 +16,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
-
+    max-height: 900px;
+    height: 100%;
+  }
+  .noButtonCountdownTimer {
+    height: 800px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .countdownStarted,
+  .paused {
+    height: 800px;
   }
   .inputCountdownTimer {
     width: 99%;
@@ -43,7 +51,9 @@
       }
     }
   }
-
+  .hide {
+    display: none;
+  }
   .progress-container {
     position: relative;
     height: 30px;
@@ -99,24 +109,42 @@
       }
     }
   }
-  
+  .infoIcon,
+  .settingIcon,
+  .pauseIcon,
+  .returnIcon,
+  .shareIcon {
+    transition: transform 0.3s ease;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 }
 .warning-container {
   display: flex;
   align-items: center;
   cursor: pointer;
+  .hashours {
+    font-size: 7vw;
+  }
+  .nohours {
+    font-size: 10vw;
+  }
+  .warningTimerContainer {
+    display: flex;  
+    width: 100%;  
+  }
   .warningTimer {
     display: flex;
     justify-content: center;
-    width: 33.3%;
-    font-size: 10vw;
     font-weight: 550;
     margin: 10px;
     border-radius: 50px;
-    color: #FFF;
+    color: yellow;
     background-color: #333;
     height: 330px;
     align-items: center;
+    width: calc(100%/3);
     .warningTimerIcon {
       width: 128px;
       height: 128px;
@@ -131,6 +159,13 @@
     text-align: center;
     font-weight: 550;
   }
+  .slide-up {
+    .timeContainer {
+      .time {
+        color: yellow;
+      }
+    }
+  }
 }
 
 .slide-up {
@@ -142,7 +177,6 @@
   transform: translate(-50%, -50%);
   background: #272727;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   width: 100%;
   height: 124%;
   z-index: 5;
@@ -168,6 +202,14 @@
       border-bottom: 2px solid #fff;
       margin-bottom: 50px;
       font-weight: 500;
+    }
+    .subtitle1 {
+      color: #999;
+      font-weight: 600;
+      font-size: 45px;
+      padding: 0;
+      margin: 0;
+      text-align: start;
     }
     .share-button {
       display: flex;
@@ -198,6 +240,10 @@
       font-weight: 600;
       border: none;
       background-color: #FFF;
+      transition: transform 0.3s ease;
+      &:hover {
+        transform: scale(1.1);
+      }
     }
     .infoButtons {
       display: flex;
@@ -254,14 +300,16 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 5vw;
+        font-size: 4vw;
       }
     }
     .countdownTimer {
       height: 1000px;
-      font-size: 23vw;
+      font-size: 20vw;
       display: flex;
       flex-direction: column;
+      width: 98vw;
+      background-color: #272727;
       .timeButtons {
         display: flex;
         justify-content: space-between;
@@ -274,6 +322,10 @@
         .seconds {
           border-radius: 50px;
           width: 250px;
+          transition: transform 0.3s ease;
+          &:hover {
+            transform: scale(1.1);
+          }
         }
         .hours {
           background-color: #750000;
@@ -301,6 +353,10 @@
           .arrow-down { 
             width: 100px;
             height: 100px;
+            transition: transform 0.3s ease;
+            &:hover {
+              transform: scale(1.1);
+            }
           }
         }
       }

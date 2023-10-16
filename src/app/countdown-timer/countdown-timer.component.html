@@ -1,72 +1,124 @@
 <div class="countdown-container" *ngIf="!shareVisible && !infoVisible && !settingVisible && !warningTimerVisible">
-  <div *ngIf="!editMode; else countdownEditmode" (click)="toggleEditMode()" class="countdownTimer">{{ countdownTime }}</div>
-  <!--countdown editmode-->
-  <ng-template #countdownEditmode>
-    <div class="slide-up">
-      <div class="content-container">
-        <button class="close" (click)=" hide()">X</button>
-        <div *ngIf="editMode" class="countdownTimer">
-          <div class="editing-controls">
-            <div class="timeContainer">
-              <span (click)="increaseEditingHours()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
-              </span>
-              <span class="time">{{ editingHours | number:'2.0-0' }}:</span>
-              <span (click)="decreaseEditingHours()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
-              </span>
+  <div class="countdownTimerContainer" *ngIf="!editModeWarning">
+    <div *ngIf="!editMode; else countdownEditmode" (click)="toggleEditMode()" class="countdownTimer">
+      <div class="noButtonCountdownTimer" [class.countdownStarted]="countdownStarted" [class.paused]="!isCountdownRunning" [class.hashours]="showHours" [class.nohours]="!showHours">
+        {{ countdownTime }}
+      </div>
+    </div>
+    <!--countdown editmode-->
+    <ng-template #countdownEditmode>
+      <div class="slide-up">
+        <div class="content-container">
+          <p class="subtitle1">set time</p>
+          <button class="close" (click)=" hide()">X</button>
+          <div *ngIf="editMode" class="countdownTimer">
+            <div class="editing-controls">
+              <div class="timeContainer">
+                <span (click)="increaseEditingHours()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                </span>
+                <span class="time">{{ editingHours | number:'2.0-0' }}:</span>
+                <span (click)="decreaseEditingHours()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                </span>
+              </div>
+              <div class="timeContainer">
+                <span (click)="increaseEditingMinutes()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                </span>
+                <span class="time">{{ editingMinutes | number:'2.0-0' }}:</span>
+                <span (click)="decreaseEditingMinutes()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                </span>
+              </div>
+              <div class="timeContainer">
+                <span (click)="increaseEditingSeconds()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                </span>
+                <span class="time">{{ editingSeconds | number:'2.0-0' }} </span>
+                <span (click)="decreaseEditingSeconds()" class="arrowContainer">
+                  <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                </span>
+              </div>
             </div>
-            <div class="timeContainer">
-              <span (click)="increaseEditingMinutes()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
-              </span>
-              <span class="time">{{ editingMinutes | number:'2.0-0' }}:</span>
-              <span (click)="decreaseEditingMinutes()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
-              </span>
+            <div class="timeButtons">
+              <div (click)="resetEditingTime()" class="hours">00:00</div>
+              <div (click)="increase5Minutes(5)" class="minutes">+05m</div>
+              <div (click)="increase15Seconds(15)" class="seconds">+15s</div>
             </div>
-            <div class="timeContainer">
-              <span (click)="increaseEditingSeconds()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-up.png" class="arrow-up">
-              </span>
-              <span class="time">{{ editingSeconds | number:'2.0-0' }} </span>
-              <span (click)="decreaseEditingSeconds()" class="arrowContainer">
-                <img src="../../assets/icon/arrow-down.png" class="arrow-down">
-              </span>
-            </div>
-          </div>
-          <div class="timeButtons">
-            <div (click)="resetEditingTime()" class="hours">00:00</div>
-            <div (click)="increase5Minutes(5)" class="minutes">+05m</div>
-            <div (click)="increase15Seconds(15)" class="seconds">+15s</div>
           </div>
         </div>
-      </div>
-    </div>    
-  </ng-template>
+      </div>    
+    </ng-template>
+  </div>
+  
   <div class="warning-container" *ngIf="warningTimeVisible">
-    <div *ngIf="!editModeWarning" (click)="toggleEditModeWarning()" class="warningTimer">{{ warningTime }}</div>
-    <div *ngIf="editModeWarning" class="warningTimer">
-      <input type="text" [(ngModel)]="userInputWarningTime" (focusout)="applyUserInputWarningTime()"  class="inputWarningTimer"/>
-    </div>
-    <div (click)="showWarningTimer()" class="warningTimer">
-      <img src="../../assets/icon/orangeLock.png" class="warningTimerIcon">
-    </div>
-    <div (click)="showWarningTimer()" class="warningTimer">
-      <img src="../../assets/icon/redLock.png" class="warningTimerIcon">
+    <div class="warningTimerContainer">
+      <div *ngIf="!editModeWarning else warningEditmode" (click)="toggleEditModeWarning()" class="warningTimer" [class.hashours]="showHours" [class.nohours]="!showHours" >{{ warningTime }}</div>
+      <!--warning editmode-->
+      <ng-template #warningEditmode>
+        <div class="slide-up">
+          <div class="content-container">
+            <p class="subtitle1">set warning times</p>
+            <button class="close" (click)="hide()">X</button>
+            <div *ngIf="editModeWarning" class="countdownTimer">
+              <div class="editing-controls">
+                <div class="timeContainer">
+                  <span (click)="increaseEditingWarningHours()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  </span>
+                  <span class="time">{{ editingWarningHours | number:'2.0-0' }}:</span>
+                  <span (click)="decreaseEditingWarningHours()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  </span>
+                </div>
+                <div class="timeContainer">
+                  <span (click)="increaseEditingWarningMinutes()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  </span>
+                  <span class="time">{{ editingWarningMinutes | number:'2.0-0' }}:</span>
+                  <span (click)="decreaseEditingWarningMinutes()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  </span>
+                </div>
+                <div class="timeContainer">
+                  <span (click)="increaseEditingWarningSeconds()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-up.png" class="arrow-up">
+                  </span>
+                  <span class="time">{{ editingWarningSeconds | number:'2.0-0' }} </span>
+                  <span (click)="decreaseEditingWarningSeconds()" class="arrowContainer">
+                    <img src="../../assets/icon/arrow-down.png" class="arrow-down">
+                  </span>
+                </div>
+              </div>
+              <div class="timeButtons">
+                <div (click)="resetEditingWarningTime()" class="hours">00:00</div>
+                <div (click)="increaseWarning5Minutes(5)" class="minutes">+05m</div>
+                <div (click)="increaseWarning15Seconds(15)" class="seconds">+15s</div>
+              </div>
+            </div>
+          </div>
+        </div>    
+      </ng-template>
+      <div (click)="showWarningTimer()" class="warningTimer" *ngIf="!editModeWarning">
+        <img src="../../assets/icon/orangeLock.png" class="warningTimerIcon">
+      </div>
+      <div (click)="showWarningTimer()" class="warningTimer" *ngIf="!editModeWarning">
+        <img src="../../assets/icon/redLock.png" class="warningTimerIcon">
+      </div>
     </div>
   </div>
-  <div class="progress-container" *ngIf="showTimeline">
+  <div class="progress-container" [class.hide]="!showTimeline" *ngIf="!editModeWarning">
     <div class="progress-bar" [style.width.%]="normalTimeProgress"></div>
     <div class="progress-bar-yellow" [style.width.%]="warningTimeProgress"></div>
     <div class="arrow" [style.left.%]="arrowPosition"></div>
   </div>
-  <div class="buttons" *ngIf="showTimeline">
-    <img src="../../assets/icon/infoIcon.png" class="buttonImage" [class.disabled]="countdownStarted" (click)="showInfo()">
-    <img src="../../assets/icon/settingIcon.png" class="buttonImage" [class.disabled]="countdownStarted" (click)="showSetting()">
-    <img [src]="countdownStarted ? '../../assets/icon/pause.png' : '../../assets/icon/playIcon.png'" class="buttonImage" [class.started]="countdownStarted" (click)="toggleCountdown()">
-    <img src="../../assets/icon/returnIcon.png" class="buttonImage" [class.started]="countdownStarted" (click)="stopCountdown()">
-    <img src="../../assets/icon/shareIcon.png" class="buttonImage" [class.disabled]="countdownStarted"(click)="showShare()">
+  <div class="buttons" *ngIf="showButtons && !editModeWarning && !editMode">
+    <img src="../../assets/icon/infoIcon.png" class="buttonImage infoIcon" [class.disabled]="countdownStarted" (click)="showInfo()">
+    <img src="../../assets/icon/settingIcon.png" class="buttonImage settingIcon" [class.disabled]="countdownStarted" (click)="showSetting()">
+    <img [src]="countdownStarted ? '../../assets/icon/pause.png' : '../../assets/icon/playIcon.png'" class="buttonImage pauseIcon" [class.started]="countdownStarted" (click)="toggleCountdown()">
+    <img src="../../assets/icon/returnIcon.png" class="buttonImage returnIcon" [class.started]="countdownStarted" (click)="stopCountdown()">
+    <img src="../../assets/icon/shareIcon.png" class="buttonImage shareIcon" [class.disabled]="countdownStarted"(click)="showShare()">
   </div>
 </div>
 

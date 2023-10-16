@@ -499,7 +499,6 @@ export class CountdownTimerComponent implements OnInit {
   toggleEditMode() {
     this.editMode = !this.editMode;
     this.warningTimeVisible = false;
-    this.showTimeline = false;
     if (this.editMode) {
       const [hours, minutes, seconds] = this.countdownTime.split(':').map(Number);
       this.editingHours = hours || 0;

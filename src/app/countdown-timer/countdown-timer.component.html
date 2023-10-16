@@ -108,7 +108,7 @@
       </div>
     </div>
   </div>
-  <div class="progress-container" [class.hide]="!showTimeline" *ngIf="!editModeWarning">
+  <div class="progress-container" [class.hide]="!showTimeline" *ngIf="!editModeWarning && !editMode">
     <div class="progress-bar" [style.width.%]="normalTimeProgress"></div>
     <div class="progress-bar-yellow" [style.width.%]="warningTimeProgress"></div>
     <div class="arrow" [style.left.%]="arrowPosition"></div>
